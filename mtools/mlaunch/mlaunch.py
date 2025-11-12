@@ -2136,7 +2136,16 @@ class MLaunchTool(BaseCmdLineTool):
                                       rs_param, newdbpath, newlogpath, port,
                                       auth_param, extra))
         else:
-            command_str = ("\"%s\" %s --dbpath \"%s\" --logpath \"%s\" "
+            # Check if mongod is running on 8.2 or higher
+            if int(self.current_version.split('.')[0]) >= 9 or (int(self.current_version.split('.')[0]) == 8 and int(self.current_version.split('.')[1]) >= 2):
+                command_str = ("nohup \"%s\" %s --dbpath \"%s\" --logpath \"%s\" "
+                               "--port %i "
+                               "%s %s > /dev/null 2>&1 &" % (os.path.join(path, 'mongod'), rs_param,
+                                                             dbpath, logpath, port, auth_param,
+                                                             extra))
+                pass
+            else:
+                command_str = ("\"%s\" %s --dbpath \"%s\" --logpath \"%s\" "
                            "--port %i --fork "
                            "%s %s" % (os.path.join(path, 'mongod'), rs_param,
                                       dbpath, logpath, port, auth_param,
@@ -2171,9 +2180,15 @@ class MLaunchTool(BaseCmdLineTool):
                                        newlogpath, port, configdb,
                                        auth_param, extra))
         else:
-            command_str = ("%s --logpath \"%s\" --port %i --configdb %s %s %s "
-                           "--fork" % (os.path.join(path, 'mongos'), logpath,
-                                       port, configdb, auth_param, extra))
+            # Check if mongos is running 8.2 or higher
+            if int(self.current_version.split('.')[0]) >= 9 or (int(self.current_version.split('.')[0]) == 8 and int(self.current_version.split('.')[1]) >= 2):
+                command_str = ("nohup %s --logpath \"%s\" --port %i --configdb %s %s %s "
+                               "> /dev/null 2>&1 &" % (os.path.join(path, 'mongos'), logpath,
+                                                       port, configdb, auth_param, extra))
+            else:
+                command_str = ("%s --logpath \"%s\" --port %i --configdb %s %s %s "
+                               "--fork" % (os.path.join(path, 'mongos'), logpath,
+                                           port, configdb, auth_param, extra))
 
         # store parameters in startup_info
         self.startup_info[str(port)] = command_str
