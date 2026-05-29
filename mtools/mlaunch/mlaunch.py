@@ -2143,7 +2143,6 @@ class MLaunchTool(BaseCmdLineTool):
                                "%s %s > /dev/null 2>&1 &" % (os.path.join(path, 'mongod'), rs_param,
                                                              dbpath, logpath, port, auth_param,
                                                              extra))
-                pass
             else:
                 command_str = ("\"%s\" %s --dbpath \"%s\" --logpath \"%s\" "
                            "--port %i --fork "
